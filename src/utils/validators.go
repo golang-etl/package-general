@@ -68,8 +68,13 @@ func ValidatorNewWithTagNameInJson(validator *validator.Validate) *validator.Val
 }
 
 func ValidatorProxyBasicFormatFn(fl validator.FieldLevel) bool {
+	value := fl.Field().String()
+	if value == "" {
+		return true
+	}
+
 	regex := `^[\w\-]+:[\w\-]+@[\w\.\-]+:\d{2,5}$`
-	match, _ := regexp.MatchString(regex, fl.Field().String())
+	match, _ := regexp.MatchString(regex, value)
 	return match
 }
 
