@@ -13,6 +13,7 @@ func PrepareValidator(validator *validator.Validate) *validator.Validate {
 	validator = ValidatorNewWithTagNameInJson(validator)
 	validator = ValidatorRegisterValidationRFC3339Nano(validator)
 	validator = ValidatorRegisterValidationRegexp(validator)
+	validator = ValidatorRegisterValidationProxyBasicFormat(validator)
 
 	return validator
 }
@@ -63,5 +64,18 @@ func ValidatorNewWithTagNameInJson(validator *validator.Validate) *validator.Val
 		return name
 	})
 
+	return validator
+}
+
+func ValidatorProxyBasicFormatFn(fl validator.FieldLevel) bool {
+	regex := `^[\w\-]+:[\w\-]+@[\w\.\-]+:\d{2,5}$`
+	match, _ := regexp.MatchString(regex, fl.Field().String())
+	return match
+}
+
+func ValidatorRegisterValidationProxyBasicFormat(validator *validator.Validate) *validator.Validate {
+	if err := validator.RegisterValidation("proxyBasicFormat", ValidatorProxyBasicFormatFn, false); err != nil {
+		panic(err)
+	}
 	return validator
 }
